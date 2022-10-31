@@ -1,35 +1,45 @@
 package com.example.demo;
 
-public class BinaryThreeAVL<T extends Comparable<? super T>> {
+public class BinaryThreeAVL<T extends Comparable<? super T>> extends Tree{
     Nodes <T> root= null;
     public BinaryThreeAVL(){
         root=null;
     }
-    public void insertAVL (T element){
-        root=insert(root, element);
+    public void insert (T element, String Ocurrence){
+        root=insertAVL(root, element, Ocurrence);
     }
 
-    public Nodes<T> insert(Nodes<T> current, T element) {
-        if (current == null)  return new Nodes<T>(element);
-        if (element.compareTo(current.element) == 1) current.right = insert(current.right, element);
-        else if (element.compareTo(current.element) ==-1) current.left= insert(current.left, element);
-        else return current;
+    public Nodes<T> insertAVL(Nodes<T> current, T element, String Ocurrence) {
+        if (current == null)  {
+
+            current= new Nodes<T>(element);
+            current.Ocurrences.insert(Ocurrence);
+            current.OcurrencesAmount=current.OcurrencesAmount+1;
+            return current;
+        }
+        if (element.compareTo(current.element) > 0)
+            current.right = insertAVL(current.right, element, Ocurrence);
+        else if (element.compareTo(current.element) <0)
+            current.left= insertAVL(current.left, element, Ocurrence);
+        else {
+
+            return current;}
 
         current.height = 1 + max(height(current.left), height(current.right));
 
         int balanceFactor = BalanceFactor(current);
 
-        if (balanceFactor > 1 && element.compareTo(current.left.element)==-1)
+        if (balanceFactor > 1 && element.compareTo(current.left.element)<0)
             return rightRotate(current);
 
-        if (balanceFactor < -1 && element.compareTo(current.right.element)==1)
+        if (balanceFactor < -1 && element.compareTo(current.right.element)>0)
             return leftRotate(current);
 
-        if (balanceFactor > 1 && BalanceFactor(current.right)<0) {
+        if (balanceFactor > 1 && element.compareTo(current.left.element)>0) {
             current.left = leftRotate(current.left);
             return rightRotate(current);
         }
-        if (balanceFactor < -1 && BalanceFactor(current.right)>0) {
+        if (balanceFactor < -1 && element.compareTo(current.right.element)<0) {
             current.right = rightRotate(current.right);
             return leftRotate(current);
         }
@@ -38,26 +48,34 @@ public class BinaryThreeAVL<T extends Comparable<? super T>> {
     }
     private Nodes<T> rightRotate(Nodes<T> current) {
         Nodes<T> newRoot = current.left;
-        Nodes<T> temp = current.right;
+        try {
 
-        newRoot.right = current;
-        current.left = temp;
+            Nodes<T> temp = current.right;
 
-        newRoot.height = max(height(current.left), height(current.right)) + 1;
-        newRoot.height = max(height(newRoot.left), height(newRoot.right)) + 1;
+            newRoot.height = max(height(current.left), height(current.right)) + 1;
+            newRoot.height = max(height(newRoot.left), height(newRoot.right)) + 1;
 
+            newRoot.right = current;
+            current.left = temp;
+
+        }
+        catch(Exception e){
+
+        }
         return newRoot;
     }
     private Nodes<T> leftRotate(Nodes<T> current) {
         Nodes<T> newRoot = current.right;
-        Nodes<T> temp = newRoot.left;
+        try {
+            Nodes<T> temp = newRoot.left;
 
-        newRoot.left = current;
-        current.right = temp;
+            current.height = max(height(current.left), height(current.right)) + 1;
+            newRoot.height = max(height(newRoot.left), height(newRoot.right)) + 1;
 
-        current.height = max(height(current.left), height(current.right)) + 1;
-        newRoot.height = max(height(newRoot.left), height(newRoot.right)) + 1;
+            newRoot.left = current;
+            current.right = temp;
 
+        }catch(Exception e) {}
         return newRoot;
     }
     public int max(int a, int b) {
@@ -71,12 +89,7 @@ public class BinaryThreeAVL<T extends Comparable<? super T>> {
         if (current == null) return 0;
         return current.height;
     }
-    public void mostrarArbolAVL() {
-        System.out.println("Arbol AVL");
-        showTree(root, 0);
-    }
-
-    private void showTree(Nodes nodo, int depth) {
+    public void showTree(Nodes nodo, int depth) {
         if (nodo.right != null) {
             showTree(nodo.right, depth + 1);
         }
@@ -89,33 +102,13 @@ public class BinaryThreeAVL<T extends Comparable<? super T>> {
             showTree(nodo.left, depth + 1);
         }
     }
-   /* public static void main(String args[]){
+    public static void main(String args[]){
         BinaryThreeAVL three = new BinaryThreeAVL();
-        three.insertAVL(1);
-        three.insertAVL(2);
-        three.insertAVL(3);
-        three.insertAVL(4);
-        three.insertAVL(5);
-        three.insertAVL(5);
-        three.insertAVL(6);
-        three.insertAVL(7);
-        three.insertAVL(8);
-        three.insertAVL(19);
-        three.insertAVL(-20);
-        three.insertAVL(-21);
-        three.insertAVL(-22);
-
-        three.insertAVL(-15);
-        three.insertAVL(-17);
-        three.insertAVL(-18);
-        three.insertAVL(-19);
-        three.insertAVL(-30);
-
-        three.insertAVL(-1);
 
 
 
-        three.mostrarArbolAVL();
-       // three.showTree(three.root,0);
-        }*/
+
+        // three.showTree(three.root,0);
     }
+}
+
