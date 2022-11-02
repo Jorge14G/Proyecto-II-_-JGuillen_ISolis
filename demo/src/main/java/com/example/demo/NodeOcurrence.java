@@ -7,5 +7,4 @@ public class NodeOcurrence {
         this.ocurrence=ocurrence;
         next=null;
     }
-
 }

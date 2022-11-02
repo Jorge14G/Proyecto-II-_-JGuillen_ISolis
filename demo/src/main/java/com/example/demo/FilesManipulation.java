@@ -6,10 +6,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStream;
-public class FilesManipulation {
 
 
-    public void insert(String nameFile){
+public class FilesManipulation <T extends Comparable<? super T>> {
+
+
+    public Tree insert(String nameFile, boolean  type){
+        Tree T= new Tree();
         int x=nameFile.length();
         String point ="";
         while(!point.equals(".")){
@@ -18,39 +21,16 @@ public class FilesManipulation {
         }
         String typeFile=nameFile.substring(x);
         if(typeFile.equals("docx")){
-            readTxtAVL(nameFile, false);
-            readTxtAVL(nameFile, true);
+            T=readTxtAVL(nameFile, type);
         }
         else if(typeFile.equals("txt")){
-            readTxtAVL(nameFile, false);
-            readTxtAVL(nameFile, true);
+            T=readTxtAVL(nameFile, type);
+
         }
         else if(typeFile.equals("pdf")){
-            readTxtAVL(nameFile, false);
-            readTxtAVL(nameFile, true);
+            T=readTxtAVL(nameFile,type);
         }
-    }
-
-
-    public String nextWords(String line, int x) {
-        String words[]= new String[4];
-        String newLine=""; int index=0;
-        int i=x;
-        while(x!=line.length( ) && index!=4) {
-            if(line.charAt(x)==' ') {
-                words[index]=line.substring(i, x); index++;
-                i=x;
-            }
-            if(x==line.length()-1)
-                words[index]=line.substring(i);
-            x++;
-        }
-        i=0;
-        while(i!=4 && words[i]!=null) {
-            newLine=newLine+words[i]+" ";
-            i++;
-        }
-        return newLine.substring(0,newLine.length());
+        return T;
     }
     @SuppressWarnings("unchecked")
     public Tree<?> readTxtAVL(String namefile, boolean type){
@@ -65,46 +45,73 @@ public class FilesManipulation {
             String line = buffere.readLine();
             String Ocurrence="";
             int x = 0;
-            int i = 0;
-            int index=0;
-            String words[] = new String[4];
-            Boolean ban=true;int y=0;
+            int i = 0; int z=0;
+            Boolean ban=true;
             while (line != null) {
                 line=line.trim();
+                String lineAux=line;
+                line=line.trim().toLowerCase();
                 while (x != line.length()) {
-                    if (line.charAt(x) != ' ' && i == 0 && ban) {
-                        i = x;  ban=false; }
-                    else if ((line.charAt(x)== ' ' && !ban)) {
-                        words[index]=line.substring(i,x);
-                        while(words[y]!=null) {
-                            Ocurrence=Ocurrence+words[y];
-                            y++;
+                    if ((line.charAt(x)>96 && line.charAt(x)<123 || line.charAt(x)>64 && line.charAt(x)<91)) {
+                        i=x;
+                        while((line.charAt(x)>96 && line.charAt(x)<123 || line.charAt(x)>64 && line.charAt(x)<91)) {
+
+                            if(x==line.length()-1) {
+                                if(type) {
+                                    z=i;
+                                    if(i!=0)z=i-1;
+                                    x++;
+                                    Ocurrence=previousWords(lineAux,z)+lineAux.substring(i,x);
+                                    x--;
+                                    tree.insert(line.substring(i,x+1), Ocurrence); ban=false; break;
+                                }
+                                else {
+                                    z=i;
+                                    if(i!=0)z=i-1;
+                                    x++;
+                                    Ocurrence=previousWords(lineAux,z)+lineAux.substring(i,x);
+                                    x--;
+                                    tree2.insert(line.substring(i,x+1), Ocurrence); ban=false; break;
+                                }
+                            }
+                            x++;
+                            ban=true;
                         }
-                        Ocurrence=Ocurrence+nextWords(line, x);
-                        index++;
-                        if(type)tree.insert(line.substring(i,x), Ocurrence);
-                        else tree2.insert(line.substring(i,x), Ocurrence);
-                        Ocurrence="";
-                        i=x; y=0;
-                        if(index==4) {
-                            words[2]=words[3];
-                            words[1]=words[2];
-                            words[0]=words[1];
-                            index--;
+                        if(ban)
+                        {
+                            ban=false;
+                            if(type) {
+                                z=i;
+                                if(i!=0)z=i-1;
+                                if(x==line.length())
+                                    x++;
+                                Ocurrence=previousWords(lineAux,z)+lineAux.substring(i,x)+nextWords(lineAux,x);
+                                tree.insert(line.substring(i,x), Ocurrence);
+                            }
+                            else {
+                                z=i;
+                                if(i!=0)z=i-1;
+                                if(x==line.length()) x++;
+                                Ocurrence=previousWords(lineAux,z)+lineAux.substring(i,x)+nextWords(lineAux,x);
+                                tree2.insert(line.substring(i,x), Ocurrence);
+                            }
+
                         }
 
                     }
-                    else if(x == line.length()-1)
-                        if(type)tree.insert(line.substring(i), Ocurrence);
-                        else tree2.insert(line.substring(i), Ocurrence);
                     x++;
+
                 }
-                words=new String[4];
+
                 x=0;
                 i=0;
-                index=0;
+                ban=true;
                 line=buffere.readLine();
             }
+
+
+
+
 
 
             buffere.close();
@@ -115,17 +122,73 @@ public class FilesManipulation {
 
         }
         Tree T= new Tree();
-        if(type) {
-            T=tree; tree.showTree(tree.root, 0);}
+        if(type)
+            T=tree;
         else {
-            T=tree2; tree2.showTree(tree2.root,0);}
+            T=tree2;
+        }
         return T;
     }
+    public String previousWords(String line, int x) {
+        Boolean ban=true;
+        int index=0;
+        int i=x;
+        if(i==0) return "";
+        while(x>0 && index!=4) {
+            while( (line.charAt(x)>96 && line.charAt(x)<123 || line.charAt(x)>64 && line.charAt(x)<91 )) {
+                ban=true;
+                if(x==0) break;
+                x--;
+            }
+            x--;
+            if(ban) {
+                index++; ban=false; }
+        }
+        if(x<0) x=0;
+        if(i!=line.length())i++;
+        return line.substring(x,i);
 
-    public static void main(String args[]){
-        FilesManipulation obj= new FilesManipulation();
+    }
+    public String nextWords(String line, int x) {
+        String words[]= new String[4];
+        String newLine=""; int index=0;
+        int i=x; Boolean ban=false;
+        if(line.length()==x) return "";
+        while(x!=line.length( ) && index!=4) {
+            while( (line.charAt(x)>96 && line.charAt(x)<123 || line.charAt(x)>64 && line.charAt(x)<91 )) {
+                ban=true;
+                if(x==line.length( )-1) break;
+                x++;
+            }
+            x++;
+            if(ban) {
+                index++; ban=false; }
+        }
 
-        obj.insert("Prueba.txt");
+        return line.substring(i,line.length());
+    }
+    public void FindWord(String element) {
+        element=element.toLowerCase();
+        findWordAux((T) element);
+    }
+    public void findWordAux(T element) {
+        TreeNodes current=Server.AVLtreeList.head;
+        String message="";
+        while(current!=null) {
+            Nodes<T> current_1 = current.data.root;
+            while (current_1 != null) {
+                if (element.compareTo(current_1.element) > 0) {
+                    current_1 = current_1.right;
+                } else if (element.compareTo(current_1.element) < 0) {
+                    current_1 = current_1.left;
+                } else {
+                    message = "Document: " + current.documentName + "\n" + current_1.Ocurrences.displayList();
+                    break;
+                }
+            }
+            System.out.println(message);
+            current = current.next;
+        }
     }
 }
 

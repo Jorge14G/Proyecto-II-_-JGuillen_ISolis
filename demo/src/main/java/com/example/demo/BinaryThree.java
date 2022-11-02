@@ -1,7 +1,6 @@
 package com.example.demo;
-
 public class BinaryThree  <T extends Comparable<? super T>> extends Tree{
-    Nodes<T> root;
+
     public BinaryThree() {
         root=null;
     }
@@ -30,7 +29,7 @@ public class BinaryThree  <T extends Comparable<? super T>> extends Tree{
         return 0;
 
     }
-    public boolean checkSame(T element) {
+    public boolean checkSame(T element, String Ocurrence) {
         Nodes <T> current =root;
 
         while(current!=null) {
@@ -48,6 +47,8 @@ public class BinaryThree  <T extends Comparable<? super T>> extends Tree{
                 current=current.left;
             }
             else  {
+                current.Ocurrences.insert(Ocurrence);
+                current.OcurrencesAmount=current.OcurrencesAmount+1;
                 return false;
             }
         }
@@ -79,8 +80,13 @@ public class BinaryThree  <T extends Comparable<? super T>> extends Tree{
     }
     public void insert(T element, String Ocurrence) {
         Nodes <T> temp= new Nodes <T>(element);
-        boolean ban= checkSame(element);
-        if(root==null) root=temp;
+        boolean ban= checkSame(element, Ocurrence);
+        if(root==null) {
+
+            root=temp;
+            root.Ocurrences.insert(Ocurrence);
+            root.OcurrencesAmount=1;
+        }
         Nodes <T> current =root;
         int x=height(element);
         while(current!=null && ban) {
@@ -91,12 +97,12 @@ public class BinaryThree  <T extends Comparable<? super T>> extends Tree{
                         current.height=1;
                         current.right=temp;
                         current.right.Ocurrences.insert(Ocurrence);
-                        current.OcurrencesAmount=current.OcurrencesAmount+1;
+                        current.right.OcurrencesAmount=1;
                     }
                     else {
                         current.right=temp;
                         current.right.Ocurrences.insert(Ocurrence);
-                        current.right.OcurrencesAmount=current.OcurrencesAmount+1;
+                        current.right.OcurrencesAmount=1;
 
                     }
                     break;
@@ -113,13 +119,13 @@ public class BinaryThree  <T extends Comparable<? super T>> extends Tree{
                         current.height=1;
                         current.left=temp;
                         current.left.Ocurrences.insert(Ocurrence);
-                        current.left.OcurrencesAmount=current.OcurrencesAmount+1;
+                        current.left.OcurrencesAmount=1;
                     }
 
                     else {
                         current.left=temp;
                         current.left.Ocurrences.insert(Ocurrence);
-                        current.OcurrencesAmount=current.OcurrencesAmount+1;
+                        current.left.OcurrencesAmount=1;
                     }
                     break;
                 }
@@ -137,7 +143,7 @@ public class BinaryThree  <T extends Comparable<? super T>> extends Tree{
         Nodes <T> current= root;
         Nodes <T> previous=root;
         boolean ban=true;
-        if(element.compareTo(root.element)==0) {
+        if(element.compareTo((T) root.element)==0) {
             if (root.right==null && root.left==null) {
                 root=null;
             }
@@ -264,19 +270,6 @@ public class BinaryThree  <T extends Comparable<? super T>> extends Tree{
         showTree(root, 0);
     }
 
-    void showTree(Nodes<T> nodo, int depth) {
-        if (nodo.right != null) {
-            showTree(nodo.right, depth + 1);
-        }
-        for (int i = 0; i < depth; i++) {
-            System.out.print("    ");
-        }
-        System.out.println("(" + nodo.element + ")");
-
-        if (nodo.left != null) {
-            showTree(nodo.left, depth + 1);
-        }
-    }
     public boolean changeHeight(Nodes <T> current, T element,int x) {
         if(element.compareTo(current.element)==1) {
             if(current.left!=null) {
@@ -352,4 +345,5 @@ public class BinaryThree  <T extends Comparable<? super T>> extends Tree{
             }
         }
     }
+
 }
